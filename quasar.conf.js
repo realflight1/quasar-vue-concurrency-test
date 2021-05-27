@@ -10,6 +10,8 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { configure } = require('quasar/wrappers');
 
+const webpack = require('webpack');
+
 module.exports = configure(function (ctx) {
   return {
     // https://v2.quasar.dev/quasar-cli/supporting-ts
@@ -54,12 +56,12 @@ module.exports = configure(function (ctx) {
     build: {
       vueRouterMode: 'hash', // available values: 'hash', 'history'
 
-      // transpile: false,
+      transpile: true,
 
       // Add dependencies for transpiling with Babel (Array of string/regex)
       // (from node_modules, which are by default not transpiled).
       // Applies only if "transpile" is set to true.
-      // transpileDependencies: [],
+      transpileDependencies: ['caf', 'regenerator-runtime', 'vue-concurrency'],
 
       // rtl: true, // https://v2.quasar.dev/options/rtl-support
       // preloadChunks: true,
@@ -75,6 +77,15 @@ module.exports = configure(function (ctx) {
       chainWebpack (/* chain */) {
         //
       },
+
+      extendWebpack (cfg) {
+        // Browser compatibility for CAF / vue-concurrency
+        cfg.plugins.push(
+          new webpack.ProvidePlugin({
+            regeneratorRuntime: 'regenerator-runtime'
+          })
+        )
+      }
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer
@@ -208,7 +219,7 @@ module.exports = configure(function (ctx) {
       builder: {
         // https://www.electron.build/configuration/configuration
 
-        appId: 'quasar-vue-concurrency-test'
+        appId: 'vue-concurrency-test'
       },
 
       // "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain
